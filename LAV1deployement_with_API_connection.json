@@ -1,0 +1,111 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_blobconnectionDeployment_name": {
+            "defaultValue": "Logicappsample",
+            "type": "String"
+        },
+        "connections_azureblob_blob_mi_externalid": {
+            "defaultValue": "/subscriptions/a781a931-d3dc-4bd0-8f43-05528dd0b6fb/resourceGroups/Serena-Azure-Resource-Group/providers/Microsoft.Web/connections/blob_msi_sample",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_blobconnectionDeployment_name')]",
+            "location": "eastasia",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Create_blob_(V2)": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": "test",
+                                "headers": {
+                                    "ReadFileMetadataFromServer": true
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('blobconnectiondeployment'))}/files",
+                                "queries": {
+                                    "folderPath": "/blobconnectiondeployment",
+                                    "name": "test.txt",
+                                    "queryParametersSingleEncoded": true
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureblob": {
+                                "connectionId": "[parameters('connections_azureblob_blob_mi_externalid')]",
+                                "connectionName": "blob_msi_sample",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "id": "/subscriptions/a781a931-d3dc-4bd0-8f43-05528dd0b6fb/providers/Microsoft.Web/locations/eastasia/managedApis/azureblob"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "blob_msi_sample",
+            "location": "eastasia",
+            "kind": "V1",
+            "properties": {
+                "api": {
+                    "id": "/subscriptions/a781a931-d3dc-4bd0-8f43-05528dd0b6fb/providers/Microsoft.Web/locations/eastasia/managedApis/azureblob"
+                },
+                "parameterValueSet": {
+                    "name": "managedIdentityAuth",
+                    "values": {}
+                },
+                "displayName": "blob_msi_sample"
+            }
+        }
+    ]
+}

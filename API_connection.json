@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {},
+	"resources": [
+		{
+			"properties": {
+				"api": {
+					"id": "/subscriptions/a781a931-d3dc-4bd0-8f43-05528dd0b6fb/providers/Microsoft.Web/locations/eastasia/managedApis/azureblob"
+				},
+				"parameterValueSet": {
+					"name": "managedIdentityAuth",
+					"values": {}
+				},
+				"displayName": "test04242024"
+			},
+			"kind": "V1",
+			"location": "eastasia",
+			"type": "Microsoft.Web/connections",
+			"apiVersion": "2016-06-01",
+			"name": "azureblob-2024"
+		}
+	]
+}
+	
+	
